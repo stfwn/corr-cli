@@ -18,16 +18,15 @@ class Cache():
         except:
             next_id = 17
 
-        margin_of_error = 3
-        article = session.get_article(next_id)
-        while article is not None:
-            self.articles[next_id] = article
-            next_id += 1
+        scanning_margin = 3
+        misses = 0
+        while misses <= scanning_margin:
             article = session.get_article(next_id)
-            for i in range(margin_of_error):
-                if article is None:
-                    next_id += 1
-                    article = session.get_article(next_id)
+            if article is None:
+                misses += 1
+            else:
+                self.articles[next_id] = article
+            next_id += 1
         
         if persist_to_disk:
             cache_folder = appdirs.user_cache_dir(APPNAME, AUTHOR)
