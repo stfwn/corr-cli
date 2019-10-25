@@ -25,6 +25,8 @@ class CorrCli(npyscreen.NPSAppManaged):
             self.session.get_article = self.get_article
 
         self.cache = Cache(APPNAME, AUTHOR)
+        if self.config['clear_cache']:
+            self.cache.clear()
 
         if not self.config['offline']:
             self.cache.fetch_new(self.session, APPNAME, AUTHOR)
@@ -91,8 +93,13 @@ if __name__ == '__main__':
         # Complement/override config with command-line arguments if applicable
         argparser = ArgumentParser(description='A CLI reader for https://www.thecorrespondent.com')
         argparser.add_argument('-o', '--offline-mode', action='store_true',
-                default=None, dest='offline', help='enable offline mode')
+                dest='offline', help='enable offline mode')
+        argparser.add_argument('-c', '--clear-cache', action='store_true',
+                dest='clear_cache', help='clear the articles cache and refetch')
+
         args = argparser.parse_args()
-        config['offline'] = args.offline
+        for attr in dir(args):
+            if attr[0] != '_':
+                config[attr] = getattr(args, attr)
 
         CorrCli = CorrCli(config).run()

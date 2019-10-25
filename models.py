@@ -5,6 +5,7 @@ import appdirs
 class Cache():
     def __init__(self, APPNAME, AUTHOR):
         cache_path = f'{appdirs.user_cache_dir(APPNAME, AUTHOR)}/articles.json'
+        self.path = cache_path
         try:
             with open(cache_path) as fp:
                 articles = json.load(fp)
@@ -35,3 +36,10 @@ class Cache():
             with open(f'{cache_folder}/articles.json', 'w') as fp:
                 json.dump(self.articles, fp, indent=4)
 
+    def clear(self):
+        if os.path.exists(self.path):
+            os.remove(self.path)
+            print('Cache cleared.')
+        else:
+            print('Cache was already empty.')
+        self.articles = {}
