@@ -37,6 +37,7 @@ affiliated with The Correspondent.
 
 ## Backlog
 
-[ ] Have a log in flow instead of having to create a config file manually.
-[ ] Command line option to only update the local cache with the latest articles
+- [ ] Add some commonly expected keybinds.
+- [ ] Have a log in flow instead of having to create a config file manually.
+- [ ] Command line option to only update the local cache with the latest articles
 and exit.
