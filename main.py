@@ -2,6 +2,7 @@
 
 import sys, os, re
 from configparser import ConfigParser
+from argparse import ArgumentParser
 import appdirs
 import requests as r
 import npyscreen
@@ -14,40 +15,30 @@ AUTHOR = 'stfwn'
 base_url = 'https://thecorrespondent.com/'
 
 class CorrCli(npyscreen.NPSAppManaged):
+    def __init__(self, config):
+        super(CorrCli, self).__init__()
+        self.config = config
+
     def onStart(self):
-        self.load_config()
-        self.login()
-        self.session.get_article = self.get_article
+        if not self.config['offline']:
+            self.login()
+            self.session.get_article = self.get_article
 
         self.cache = Cache(APPNAME, AUTHOR)
-        self.cache.fetch_new(self.session, APPNAME, AUTHOR)
+
+        if not self.config['offline']:
+            self.cache.fetch_new(self.session, APPNAME, AUTHOR)
 
         self.addForm('MAIN', ArticlePicker, name='Article Picker')
         self.addForm('READER', ArticleReader, name='Article Reader')
-
-    def load_config(self):
-        # Load config
-        config_path = appdirs.user_config_dir(APPNAME, AUTHOR) + '/config'
-        config = ConfigParser()
-        config.read(config_path)
-        try:
-            config['thecorrespondent.com']['name']
-            config['thecorrespondent.com']['email']
-            config['thecorrespondent.com']['password']
-        except KeyError as e:
-            sys.stderr.write(f'Info not supplied in config file: {e}\n')
-            sys.stderr.write(f"The config file is located here: '{config_path}'\n")
-            sys.exit(1)
-
-        self.config = config
 
     def login(self):
         """ Set the cookie for the session. """
         s = r.Session()
 
-        name = self.config['thecorrespondent.com']['name']
-        email = self.config['thecorrespondent.com']['email']
-        password = self.config['thecorrespondent.com']['password']
+        name = self.config['name']
+        email = self.config['email']
+        password = self.config['password']
         try:
             page = s.post(base_url + 'api2/account/password-authenticate',
                     data={'emailAddress': email, 'password': password}).text
@@ -79,5 +70,29 @@ class CorrCli(npyscreen.NPSAppManaged):
                 'text': article_text}
         return article
 
+
 if __name__ == '__main__':
-    CorrCli = CorrCli().run()
+        # Load config
+        config_path = appdirs.user_config_dir(APPNAME, AUTHOR) + '/config'
+        config = ConfigParser()
+        config.read(config_path)
+        config = config['thecorrespondent.com']
+        try:
+            config['name']
+            config['email']
+            config['password']
+        except KeyError as e:
+            sys.stderr.write(f'Info not supplied in config file: {e}\n')
+            sys.stderr.write(f"The config file is located here: '{config_path}'\n")
+            sys.exit(1)
+
+        config = dict(config)
+
+        # Complement/override config with command-line arguments if applicable
+        argparser = ArgumentParser(description='A CLI reader for https://www.thecorrespondent.com')
+        argparser.add_argument('-o', '--offline-mode', action='store_true',
+                default=None, dest='offline', help='enable offline mode')
+        args = argparser.parse_args()
+        config['offline'] = args.offline
+
+        CorrCli = CorrCli(config).run()
