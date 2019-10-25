@@ -31,12 +31,14 @@ affiliated with The Correspondent.
   `name` should be your first name _exactly_ as it appears in the top right
   of your homepage after you first log in.
 
-4. `python main.py`
+4. `python main.py`. The first run takes a while because it is caching all the
+   articles locally.
 5. Use `up`/`down` or `j`/`k` to navigate, `enter` to select, `l` to search and
    `escape` to return or exit.
 
 ## Backlog
 
+- [ ] Have status messages on start-up.
 - [ ] Add some commonly expected keybinds.
 - [ ] Have a log in flow instead of having to create a config file manually.
 - [ ] Command line option to only update the local cache with the latest articles
