@@ -19,7 +19,7 @@ class Cache():
         except:
             next_id = 17
 
-        scanning_margin = 3
+        scanning_margin = 4
         misses = 0
         while misses <= scanning_margin:
             article = session.get_article(next_id)

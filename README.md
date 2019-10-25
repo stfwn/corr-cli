@@ -42,12 +42,12 @@ optional arguments:
   -h, --help          show this help message and exit
   -o, --offline-mode  enable offline mode
   -c, --clear-cache   clear the articles cache and refetch
+  -u, --update-only   update the cache and exit
 ```
 
 ## Backlog
 
+- [x] Add some command line options.
 - [ ] Have status messages on start-up.
 - [ ] Add some commonly expected keybinds.
 - [ ] Have a log in flow instead of having to create a config file manually.
-- [ ] Command line option to only update the local cache with the latest articles
-and exit.

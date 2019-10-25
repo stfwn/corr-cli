@@ -20,7 +20,7 @@ class CorrCli(npyscreen.NPSAppManaged):
         self.config = config
 
     def onStart(self):
-        if not self.config['offline']:
+        if not self.config['offline_mode']:
             self.login()
             self.session.get_article = self.get_article
 
@@ -28,8 +28,11 @@ class CorrCli(npyscreen.NPSAppManaged):
         if self.config['clear_cache']:
             self.cache.clear()
 
-        if not self.config['offline']:
+        if not self.config['offline_mode']:
             self.cache.fetch_new(self.session, APPNAME, AUTHOR)
+
+        if self.config['update_only']:
+            sys.exit(0)
 
         self.addForm('MAIN', ArticlePicker, name='Article Picker')
         self.addForm('READER', ArticleReader, name='Article Reader')
@@ -74,7 +77,7 @@ class CorrCli(npyscreen.NPSAppManaged):
 
 
 if __name__ == '__main__':
-        # Load config
+        # Load config from config file
         config_path = appdirs.user_config_dir(APPNAME, AUTHOR) + '/config'
         config = ConfigParser()
         config.read(config_path)
@@ -90,14 +93,24 @@ if __name__ == '__main__':
 
         config = dict(config)
 
-        # Complement/override config with command-line arguments if applicable
+        # Parse command-line args
         argparser = ArgumentParser(description='A CLI reader for https://www.thecorrespondent.com')
         argparser.add_argument('-o', '--offline-mode', action='store_true',
-                dest='offline', help='enable offline mode')
+                dest='offline_mode', help='enable offline mode')
         argparser.add_argument('-c', '--clear-cache', action='store_true',
                 dest='clear_cache', help='clear the articles cache and refetch')
+        argparser.add_argument('-u', '--update-only', action='store_true',
+                dest='update_only', help='update the cache and exit')
 
         args = argparser.parse_args()
+        
+        # Handle conflicts
+        if args.offline_mode and args.update_only:
+            sys.stderr.write('Conflicting arguments: '
+                    'fetching articles is not possible in offline mode.\n')
+            sys.exit(1)
+
+        # Merge config file and command-line arguments (latter has precedence)
         for attr in dir(args):
             if attr[0] != '_':
                 config[attr] = getattr(args, attr)
