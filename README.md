@@ -41,6 +41,7 @@ affiliated with The Correspondent.
 optional arguments:
   -h, --help          show this help message and exit
   -o, --offline-mode  enable offline mode
+  -c, --clear-cache   clear the articles cache and refetch
 ```
 
 ## Backlog
