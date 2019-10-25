@@ -36,6 +36,13 @@ affiliated with The Correspondent.
 5. Use `up`/`down` or `j`/`k` to navigate, `enter` to select, `l` to search and
    `escape` to return or exit.
 
+### Options
+```
+optional arguments:
+  -h, --help          show this help message and exit
+  -o, --offline-mode  enable offline mode
+```
+
 ## Backlog
 
 - [ ] Have status messages on start-up.
